@@ -17,8 +17,6 @@ import java.sql.*;
 import java.util.Properties;
 
 public class SSHMySQLConnector extends AbstractTest{
-
-    //private static final String DB_URL = "jdbc:mysql://cloudximage-databasemysqlinstanced64026b2-b5g8ybgusre5.crgam0u8sl3j.eu-central-1.rds.amazonaws.com:3306/cloudximages";
     private static final String DB_URL = "jdbc:mysql://localhost:3306/cloudximages";
     private static final int LOCAL_PORT = 3306; // Local port for SSH tunnel
     private static final int REMOTE_PORT = 3306; // MySQL port on the remote server
