@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 public class SSHMySQLConnector extends AbstractTest{
@@ -35,8 +37,9 @@ public class SSHMySQLConnector extends AbstractTest{
         return DriverManager.getConnection(DB_URL, connectionProps);
     }
 
-    protected ImageMetadata getImageMetadataFromRds(String imageName) throws IOException, SQLException {
+    protected List<ImageMetadata> getImageMetadataFromRds(String imageName) throws IOException, SQLException {
         SSHClient ssh = new SSHClient();
+        List<ImageMetadata> metadataList = new ArrayList<>();
         ssh.addHostKeyVerifier(new PromiscuousVerifier());
 
         try {
@@ -62,17 +65,17 @@ public class SSHMySQLConnector extends AbstractTest{
                 forwarderThread.start();
             // Now you can connect to the MySQL database using the local port
             conn = getConnection();
-                String query = "SELECT * FROM images i WHERE i.object_key = 'images/7936d654-6fc0-4b56-a1c0-97969c08a939-ES_v1_configuration.jpg'";
+                String query = "SELECT * FROM images i WHERE i.object_key = 'images/0c7da500-f9c7-4e92-a105-d4f9529cdcdf-ES_v1_configuration.jpg'";
                 try (PreparedStatement stmt = conn.prepareStatement(query)) {
                    // stmt.setString(1, imageName);
                     try (ResultSet rs = stmt.executeQuery()) {
-                        if (rs.next()) {
-                            return new ImageMetadata(
+                        while (rs.next()) {
+                            metadataList.add( new ImageMetadata(
                                     rs.getString("id"),
                                     rs.getString("object_key"),
                                     rs.getLong("object_size"),
                                     rs.getString("object_type"),
-                                    rs.getTimestamp("last_modified"));
+                                    rs.getTimestamp("last_modified")));
 
                         }
                     }
@@ -109,17 +112,17 @@ public class SSHMySQLConnector extends AbstractTest{
             }
             ssh.disconnect();
         }
-        return null;
+        return metadataList;
     }
     @Test
     public void rdsConnectionTest() {
         SSHMySQLConnector connector = new SSHMySQLConnector();
         try {
-            ImageMetadata metadata = connector.getImageMetadataFromRds("ES_v1_configuration.jpg");
-            if (metadata != null) {
-                System.out.println(metadata);
-            } else {
-                System.out.println("No metadata found for the given image key.");
+            List<ImageMetadata> metadataList = connector.getImageMetadataFromRds("ES_v1_configuration.jpg");
+            if (metadataList.isEmpty()) {
+                System.out.println(metadataList);
+            }for (ImageMetadata metadata : metadataList) {
+                System.out.println("Image Metadata: " + metadata);
             }
         } catch (IOException | SQLException e) {
             e.printStackTrace();
