@@ -30,11 +30,11 @@ public class LambdaTests{
 
         // Verify Memory Size
         logger.info("Memory Size: " + response.memorySize());
-        assertEquals("Lambda memory size is incorrect", Optional.ofNullable(128), Optional.ofNullable(response.memorySize()));
+        assertEquals("Lambda memory size is incorrect", Optional.of(128).get(), Optional.ofNullable(response.memorySize()).get());
 
         // Verify Ephemeral Storage
         logger.info("Ephemeral Storage: " + response.ephemeralStorage().size());
-        assertEquals("Lambda ephemeral storage is incorrect", Optional.ofNullable(512), Optional.ofNullable(response.ephemeralStorage().size()));
+        assertEquals("Lambda ephemeral storage is incorrect", Optional.ofNullable(512).get(), Optional.ofNullable(response.ephemeralStorage().size()).get());
 
         // Verify Timeout
         logger.info("Timeout: " + response.timeout());
